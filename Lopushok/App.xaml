@@ -38,6 +38,7 @@
         <Style TargetType="ComboBox">
             <Setter Property="FontSize" Value="14" />
             <Setter Property="Margin" Value="10" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
         <Style TargetType="ComboBoxItem">
             <Setter Property="Margin" Value="10" />

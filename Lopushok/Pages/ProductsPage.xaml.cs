@@ -34,6 +34,27 @@ namespace Lopushok.Pages
 
             lbProducts.ItemsSource = products;
             lbProducts.SelectedValuePath = "ID";
+
+            List<ProductType> filter = DB.db.ProductType.ToList();
+            filter.Insert(0, new ProductType { Title = "Все типы" });
+
+            cbFilter.ItemsSource = filter;
+            cbFilter.SelectedValuePath = "ID";
+            cbFilter.DisplayMemberPath = "Title";
+            cbFilter.SelectedIndex = 0;
+
+            List<string> sort = new List<string>();
+            sort.Add("Сортировака");
+            sort.Add("По названию");
+            sort.Add("По типу продукции");
+            sort.Add("По мин. стоимости");
+
+            cbSort.ItemsSource = sort;
+            cbSort.SelectedIndex = 0;
+
+
+            rbAsc.IsEnabled = false;
+            rbDesc.IsEnabled = false;
         }
 
         private void tbSearch_TextChanged(object sender, TextChangedEventArgs e)
@@ -45,33 +66,66 @@ namespace Lopushok.Pages
         {
             if (tbSearch.Text != "")
             {
-
                 products = DB.db.Product.Where(p => (p.Title.ToString() + p.ProductType.Title.ToString()).ToLower().Contains(tbSearch.Text.ToLower())).ToList();
-
-
-                lbProducts.ItemsSource = products;
             }
             else
             {
                 products = DB.db.Product.ToList();
-
-                lbProducts.ItemsSource = products;
             }
+
+            if(cbFilter.SelectedIndex != 0)
+            {
+                products = products.Where(p => p.ProductType == cbFilter.SelectedItem).ToList();
+            }
+
+            if(cbSort.SelectedIndex != 0)
+            {
+                rbAsc.IsEnabled = true;
+                rbDesc.IsEnabled = true;
+
+                switch (cbSort.SelectedIndex)
+                {
+                    case 1:
+                        if (rbAsc.IsChecked == true)
+                            products = products.OrderBy(p => p.Title).ToList();
+                        else products = products.OrderByDescending(p => p.Title).ToList();
+                        break;
+                    case 2:
+                        if (rbAsc.IsChecked == true)
+                            products = products.OrderBy(p => p.ProductType.Title).ToList();
+                        else products = products.OrderByDescending(p => p.ProductType.Title).ToList();
+                        break;
+                    case 3:
+                        if (rbAsc.IsChecked == true)
+                            products = products.OrderBy(p => p.MinCostForAgent).ToList();
+                        else products = products.OrderByDescending(p => p.MinCostForAgent).ToList();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                rbAsc.IsEnabled = false;
+                rbDesc.IsEnabled = false;
+            }
+
+            lbProducts.ItemsSource = products;
         }
 
         private void cbFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            FindProduct();
         }
 
         private void cbSort_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            FindProduct();
         }
 
         private void radioButton_Click(object sender, RoutedEventArgs e)
         {
-
+            FindProduct();
         }
 
         private void btnAdd_Click(object sender, RoutedEventArgs e)
